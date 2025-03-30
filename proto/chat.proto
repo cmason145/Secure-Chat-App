@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package securechat;
+
+service ChatService {
+  // Authentication and session management
+  rpc Authenticate(AuthRequest) returns (AuthResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  
+  // Peer discovery
+  rpc DiscoverPeers(DiscoveryRequest) returns (DiscoveryResponse);
+  rpc RequestBridge(BridgeRequest) returns (BridgeResponse);
+  
+  // Messaging
+  rpc SendMessage(EncryptedMessage) returns (MessageStatus);
+  rpc ReceiveMessages(ReceiveRequest) returns (stream EncryptedMessage);
+}
+
+message AuthRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  bool success = 1;
+  string session_token = 2;
+  string error_message = 3;
+}
+
+message RegisterRequest {
+  string client_id = 1;
+  string ip = 2;
+  int32 port = 3;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message DiscoveryRequest {
+  string client_id = 1;
+}
+
+message DiscoveryResponse {
+  repeated PeerInfo peers = 1;
+}
+
+message PeerInfo {
+  string client_id = 1;
+  string ip = 2;
+  int32 port = 3;
+  bool available = 4;
+}
+
+message BridgeRequest {
+  string client_id = 1;
+}
+
+message BridgeResponse {
+  bool success = 1;
+  PeerInfo peer = 2;
+  string error_message = 3;
+}
+
+message EncryptedMessage {
+  string sender_id = 1;
+  string recipient_id = 2;
+  string iv = 3;
+  string ciphertext = 4;
+  string tag = 5;
+}
+
+message MessageStatus {
+  bool delivered = 1;
+  string error_message = 2;
+}
+
+message ReceiveRequest {
+  string client_id = 1;
+}
